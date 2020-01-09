@@ -59,8 +59,8 @@ R CMD javareconf
 Depuis le dossier Destinie-2 (root du dépôt) :
 
 ```
-R -e "install.packages('packrat', repos = 'https://cloud.r-project.org')"
-R -e "packrat::restore()"
+R -e "install.packages('renv', repos = 'https://cloud.r-project.org')"
+R -e "renv::restore()"
 R CMD INSTALL . --preclean --debug
 ```
 
