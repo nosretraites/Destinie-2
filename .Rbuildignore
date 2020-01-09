@@ -1,7 +1,6 @@
 ^data-raw/
 ^demo/
 ^documentation/
-^lib.*/
 ^server/
 ^packrat/
 ^parametres/

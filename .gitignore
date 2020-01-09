@@ -105,6 +105,5 @@ __pycache__
 .venv
 
 # Packarat
-lib*/
 packrat/lib*/
 packrat/src*/
