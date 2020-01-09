@@ -103,3 +103,8 @@ documentation/doxygen/latex/*
 
 __pycache__
 .venv
+
+# Packarat
+lib*/
+packrat/lib*/
+packrat/src*/
