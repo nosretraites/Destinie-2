@@ -381,12 +381,18 @@ if (length(demoSimulation$retraites)) {
   #print(demoSimulation$retraites %>% select(annee, pension_neut_m))
 
   demoSimulation$taux_remplacement = demoSimulation$retraites %>% group_by(Id) %>% mutate(debut=min(annee)) %>% filter(annee == debut) %>% select(Id, TR_net_neut)
+
+  demoSimulation$taux_remplacement_brut <- inner_join(
+    demoSimulation$retraites %>% group_by(Id) %>% mutate(debut=min(annee)) %>% filter(annee == debut) %>% select(Id, age, pension),
+    demoSimulation$emp %>% group_by(Id) %>% mutate(age = age+1),
+    by = c("Id", "age")
+  ) %>% select(Id, age, pension, salaire) %>% mutate(TR_brut = pension/salaire)
 }
 
 if(T) {
   ## Create a new workbook
   wb <- createWorkbook("fullhouse")
-  for (field in c("ech", "emp", "fam", "liquidations", "retraites", "salairenet", "taux_remplacement", "cotisations", "macro")){
+  for (field in c("ech", "emp", "fam", "liquidations", "retraites", "salairenet", "taux_remplacement", "taux_remplacement_brut", "cotisations", "macro")){
     addWorksheet(wb, field)
     writeData(wb, field, demoSimulation[[field]])
   }
