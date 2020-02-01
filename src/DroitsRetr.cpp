@@ -1403,9 +1403,8 @@ void DroitsRetr::LiqPrive(int AnneeRefAnticip) {
 
   if (options->codeRegime == COMM_PM && t >= t_transition) {
     // Corrige le taux de proratisation
-    double t_debut_carriere = X.anaiss % 1900 + 22; // 22 TODO
-    taux_prorat_univ = min(1.0, max(0.0, (t_transition - t_debut_carriere) / (t - t_debut_carriere)));
-
+    double duree_avant_transition = duree_trim(Statuts_occ, t_transition);
+    taux_prorat_univ = min(1.0, max(0.0, duree_avant_transition / l.DureeProratRG));
     taux *= taux_prorat_univ * (1 + maj_rendement_univ);
   }
 
