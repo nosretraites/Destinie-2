@@ -12,7 +12,7 @@ shifted_ech = read.xlsx(shifted, 'ech')
 shifted_tr = read.xlsx(shifted, field) %>% mutate(scenario='actuel') %>% left_join(shifted_ech %>% select(Id, anaiss), by="Id")
 
 reforme_ech = read.xlsx(reforme, 'ech')
-reforme_tr = read.xlsx(reforme, field) %>% mutate(scenario='reforme') %>% left_join(shifted_ech %>% select(Id, anaiss), by="Id")
+reforme_tr = read.xlsx(reforme, field) %>% mutate(scenario='reforme') %>% left_join(reforme_ech %>% select(Id, anaiss), by="Id")
 
 fullset = bind_rows(shifted_tr, reforme_tr)
 wb <- createWorkbook("fullhouse")
