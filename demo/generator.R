@@ -1,6 +1,6 @@
 library(stringr)
 
-lib=Sys.getenv('DESTINIE_LIB_PATH ')
+lib=Sys.getenv('DESTINIE_LIB_PATH')
 if (str_length(lib)) {
   .libPaths(lib)
 }
