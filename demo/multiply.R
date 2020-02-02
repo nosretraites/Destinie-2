@@ -3,10 +3,9 @@ library(openxlsx)
 library(stringr)
 library(tidyr)
 
-source = "/home/thomas/repos/Destinie-2/cas-types/salarie_smpt_g80_2_/salarie_smpt_g80_2_.xlsx"
-
-age_exo=seq(62, 63)
-age_exo=seq(62, 68, 1/24)
+args = commandArgs(trailingOnly = TRUE)
+source = args[[1]]
+age_exo=seq(62, 68)
 
 ids = data.frame(Id=seq(1,length(age_exo)))
 input = ids %>% mutate(age_exo=age_exo)
@@ -22,9 +21,5 @@ for (field in c("ech", "emp", "fam")){
   writeData(wb, field, env[[field]])
 }
 prefix = str_sub(source,0,-6)
-duplicate_path = paste0(prefix, '.duplicate.xlsx')
-## Save workbook
+duplicate_path = paste0(prefix, '.multiple.xlsx')
 saveWorkbook(wb, duplicate_path, overwrite = TRUE)
-
-
-# Rscript demo/simulation.R --age-exo 0 --library ~/R-tests --regime ACUTEL --file
