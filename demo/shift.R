@@ -3,14 +3,23 @@ library(openxlsx)
 library(stringr)
 library(tidyr)
 
-source = "/home/lesly/Work/Destinie-2/demo/2020-02-02--11-07-56.118833-config.results.xlsx"
-macro = data.frame(annee=1900:2070, SMPT=1900:2070 * 1.0)
+lib=Sys.getenv('DESTINIE_LIB_PATH')
+if (str_length(lib)) {
+  .libPaths(lib)
+}
+library(destinie)
+
+args = commandArgs(trailingOnly = TRUE)
+source = args[[1]]
+eco = destinie::get_macro()
+macro = eco$macro
 
 ref_year=1960
-shift = ref_year - ech$anaiss
 
 # Calcule nouvelle année de naissance décalée et ID
 ech_base = read.xlsx(source, 'ech')
+shift = ref_year - ech_base$anaiss
+
 id_shift = ech_base$Id + max(ech_base$Id)
 ech_shift = ech_base %>% mutate(anaiss = ref_year, Id = id_shift)
 ech = bind_rows(ech_base, ech_shift)
@@ -44,8 +53,4 @@ for (field in c("ech", "emp", "fam")){
 }
 prefix = str_sub(source,0,-6)
 duplicate_path = paste0(prefix, '.shifte.xlsx')
-## Save workbook
 saveWorkbook(wb, duplicate_path, overwrite = TRUE)
-
-
-# Rscript demo/simulation.R --age-exo 0 --library ~/R-tests --regime ACUTEL --file
