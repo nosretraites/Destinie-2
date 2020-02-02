@@ -65,7 +65,7 @@ def expert_mode():
 
 
             result_path = '%s.results.xlsx' % file_path[:-5]
-            
+
             myCmd = 'Rscript ../demo/simulation.R --file %s %s' % (file_path, common_parameters(request.form))
 
             os.system(myCmd)
@@ -83,9 +83,7 @@ import pandas as pd
 meta = pd.read_excel('../demo/carrieres.xlsx', sheet_name='meta')
 carrieres = list(meta.itertuples())
 
-@app.route('/basic', methods=['GET', 'POST'])
-def basic_mode():
-    if request.method == 'POST':
+def basic_mutualized():
         filename = "config.json"
         prefix = str(datetime.datetime.now()).replace(':', '-').replace(' ', '--')
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], '%s-%s' % (prefix, filename))
@@ -99,14 +97,30 @@ def basic_mode():
         with open(file_path, "w+") as fp:
             json.dump(data, fp)
             print(file_path)
+        return file_path, '%s.results.xlsx' % file_path[:-5]
 
-        result_path = '%s.results.xlsx' % file_path[:-5]
+
+@app.route('/basic', methods=['GET', 'POST'])
+def basic_mode():
+    if request.method == 'POST':
+        file_path, result_path = basic_mutualized()
         myCmd = 'Rscript ../demo/simulation.R --config %s %s' % (file_path, common_parameters(request.form))
         os.system(myCmd)
         return send_file(result_path, as_attachment=True)
-
         #return render_template('basic.html', form=request.form)
+    return render_template('basic.html', carrieres=carrieres)
 
+@app.route('/basic2', methods=['GET', 'POST'])
+def basic2_mode():
+    if request.method == 'POST':
+        file_path, result_path = basic_mutualized()
+        myCmdConfig = 'Rscript ../demo/generator.R %s' % (file_path)
+        os.system(myCmdConfig)
+        generated_path = '%s.xlsx' % file_path[:-5]
+        myCmdResult = 'Rscript ../demo/simulate.R --file %s %s' % (generated_path, common_parameters(request.form))
+        os.system(myCmdResult)
+        return send_file(result_path, as_attachment=True)
+        #return render_template('basic.html', form=request.form)
     return render_template('basic.html', carrieres=carrieres)
 
 
