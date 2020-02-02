@@ -1,3 +1,4 @@
+
 import os
 from flask import Flask, flash, request, redirect, url_for, send_file, render_template, jsonify, abort
 from flask_cors import CORS
@@ -6,10 +7,8 @@ from werkzeug.utils import secure_filename
 import datetime
 from time import sleep
 import json
-import pandas as pd
-import random
-
 import df_utils
+import random
 
 UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = {'xlsx'}
@@ -19,7 +18,6 @@ LIFE_LENGTH = 97
 
 SMIC_NET = 14071.0
 SMIC_BRUT = 17968.0
-
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -75,7 +73,7 @@ def expert_mode():
 
 
             result_path = '%s.results.xlsx' % file_path[:-5]
-            
+
             myCmd = 'Rscript ../demo/simulation.R --file %s %s' % (file_path, common_parameters(request.form))
 
             os.system(myCmd)
@@ -85,9 +83,15 @@ def expert_mode():
     return render_template('expert.html')
 
 
-@app.route('/basic', methods=['GET', 'POST'])
-def basic_mode():
-    if request.method == 'POST':
+# from collections import namedtuple
+# C = namedtuple('Carriere', ['id', 'description'])
+# carrieres = [C('SMPT', 'SMPT'), C('SMIC', 'SMIC')]
+
+import pandas as pd
+meta = pd.read_excel('../demo/carrieres.xlsx', sheet_name='meta')
+carrieres = list(meta.itertuples())
+
+def basic_mutualized():
         filename = "config.json"
         prefix = str(datetime.datetime.now()).replace(':', '-').replace(' ', '--')
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], '%s-%s' % (prefix, filename))
@@ -95,21 +99,38 @@ def basic_mode():
             "naissance": int(request.form["naissance"]),
             "debut": int(request.form["debut"]),
             "carriere": request.form["carriere"],
-            "carrieres_path": CARRIERE_PRESET,
+            "carrieres_path": "../demo/carrieres.xlsx",
             "proportion": float(request.form["proportion"]),
         }
         with open(file_path, "w+") as fp:
             json.dump(data, fp)
             print(file_path)
+        return file_path, '%s.results.xlsx' % file_path[:-5]
 
-        result_path = '%s.results.xlsx' % file_path[:-5]
+
+@app.route('/basic', methods=['GET', 'POST'])
+def basic_mode():
+    if request.method == 'POST':
+        file_path, result_path = basic_mutualized()
         myCmd = 'Rscript ../demo/simulation.R --config %s %s' % (file_path, common_parameters(request.form))
         os.system(myCmd)
         return send_file(result_path, as_attachment=True)
-
         #return render_template('basic.html', form=request.form)
-
     return render_template('basic.html', carrieres=carrieres)
+
+@app.route('/basic2', methods=['GET', 'POST'])
+def basic2_mode():
+    if request.method == 'POST':
+        file_path, result_path = basic_mutualized()
+        myCmdConfig = 'Rscript ../demo/generator.R %s' % (file_path)
+        os.system(myCmdConfig)
+        generated_path = '%s.xlsx' % file_path[:-5]
+        myCmdResult = 'Rscript ../demo/simulate.R --file %s %s' % (generated_path, common_parameters(request.form))
+        os.system(myCmdResult)
+        return send_file(result_path, as_attachment=True)
+        #return render_template('basic.html', form=request.form)
+    return render_template('basic.html', carrieres=carrieres)
+
 	
 @app.route('/fetch_carrierPaths', methods=['GET'])
 def fetch_carrierPaths():
@@ -205,8 +226,7 @@ def custom_simulation():
 	response['output'] = df_utils.parse_results(result_path)
 	
 	return jsonify(response)
-	
-	
+
 @app.route('/', methods=['GET'])
 def home():
     return render_template('home.html')
