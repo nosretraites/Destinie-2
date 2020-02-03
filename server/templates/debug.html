@@ -1,9 +1,10 @@
 <!doctype html>
 <title>Simuler les retraites</title>
 {% include 'style.html' %}
-<h1>Calcul du % que représente la pension en fonction du dernier salaire</h1>
+<h1>Version debug pour obtenir les résultats pour plusieurs âge de départ à la retraite</h1>
 <form method=post>
   {% include 'profil.html' %}
-    <button type="submit">Envoyer</button>
+  {% include 'models.html' %}
+  <button type="submit">Envoyer</button>
 </form>
 <div><a href="/">Accueil</a></div>

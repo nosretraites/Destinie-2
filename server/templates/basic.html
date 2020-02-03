@@ -3,18 +3,7 @@
 {% include 'style.html' %}
 <h1>Version basique</h1>
 <form method=post>
-  <label>Année de naissance<input name="naissance" value="{{ form['naissance'] if 'naissance' in form else '1980' }}"/></label>
-  <label>Âge de début de carrière<input name="debut" value="{{ form['debut'] if 'debut' in form else '22' }}"/></label>
-  <label>Base du salaire
-    <select name="carriere">
-      {% for i in carrieres %}
-        <option value="{{ i.id }}" {{ 'selected' if 'carriere' in form and form['carriere'] == i.id }}>
-          {{ i.description }}
-        </option>
-      {% endfor %}
-    </select>
-  </label>
-  <label>Proportion de la base<input name="proportion" value="{{ form['proportion'] if 'proportion' in form else '1' }}"/></label>
+  {% include 'profil.html' %}
   {% include 'ages.html' %}
   {% include 'models.html' %}
   <button type="submit">Envoyer</button>
