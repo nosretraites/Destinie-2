@@ -28,9 +28,6 @@ SANE_MODELS = ['ACTUEL', 'ACTUEL_MODIF', 'DELEVOYE', 'COMM_PM']
 def common_parameters(form, sep=' '):
     params = []
 
-    if ('noInfla' in form):
-        if (form['noInfla'] == 'on'):
-            params.append('--no-infla')
 
     if ('modele' in form):
         if (form['modele'] in SANE_MODELS):
@@ -152,7 +149,7 @@ def multi_mode():
         myCmdAggreg = "Rscript ../demo/aggregate.R %s %s %s" % (shifted_result, multiple_results, result_path)
         os.system(myCmdAggreg)
         return send_file(result_path, as_attachment=True)
-    return render_template('basic.html', carrieres=carrieres)
+    return render_template('multi.html', carrieres=carrieres)
 
 
 @app.route('/', methods=['GET'])
