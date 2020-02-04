@@ -61,4 +61,14 @@ if (length(prefixIndex) && prefixIndex < length(args)) {
 }
 library(destinie)
 
-simulate(sourcepath)
+age_exo=-1
+prefixIndex = which(args == "--age-exo")
+if (length(prefixIndex) && prefixIndex < length(args)) {
+  age_exo=as.integer(args[prefixIndex+1])
+  comportement=3
+  if (age_exo>0) {
+    simul$ech$age_exo=age_exo
+  }
+}
+
+simulate(sourcepath, regime, age_exo)

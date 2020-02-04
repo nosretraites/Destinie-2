@@ -120,32 +120,13 @@ def basic2_mode():
         #return render_template('basic.html', form=request.form)
     return render_template('basic.html', carrieres=carrieres)
 
+
 @app.route('/multi', methods=['GET', 'POST'])
 def multi_mode():
     if request.method == 'POST':
         file_path, result_path = basic_mutualized(result_suffix=".aggregate.results.xlsx")
-        myCmdConfig = 'Rscript ../demo/generator.R %s' % (file_path)
+        myCmdConfig = 'Rscript ../demo/multi.R %s %s' % (file_path, result_path)
         os.system(myCmdConfig)
-        xlsx_path = '%s.xlsx' % file_path[:-5]
-
-        myCmdShift = 'Rscript ../demo/shift.R %s' % (xlsx_path)
-        os.system(myCmdShift)
-        shifted_file = '%s.shifte.xlsx' % file_path[:-5]
-
-        myCmdResultActuel = 'Rscript ../demo/simulate.R --file %s --regime %d %s' % (shifted_file, 1, common_parameters(request.form))
-        os.system(myCmdResultActuel)
-        shifted_result = '%s.results.xlsx' % shifted_file[:-5]
-
-        myCmdMultiply = 'Rscript ../demo/multiply.R %s' % (xlsx_path)
-        os.system(myCmdMultiply)
-        multiple_file = '%s.multiple.xlsx' % file_path[:-5]
-
-        myCmdResultReform = 'Rscript ../demo/simulate.R --file %s --regime %s --age-exo %d' % (multiple_file, "COMM_PM", 0)
-        os.system(myCmdResultReform)
-        multiple_results = '%s.results.xlsx' % multiple_file[:-5]
-
-        myCmdAggreg = "Rscript ../demo/aggregate.R %s %s %s" % (shifted_result, multiple_results, result_path)
-        os.system(myCmdAggreg)
         return send_file(result_path, as_attachment=True)
     return render_template('multi.html', carrieres=carrieres)
 

@@ -1,11 +1,16 @@
 
 #' @description Calcule
 #' @export 
-simulate <- function(source, provided_age_exo=-1) {
-  
+simulate <- function(source, pRegime, provided_age_exo=-1) {
   # 0 = TauxPlein ; 3 = EXO
   comportement=0
 
+  regimes = c(ACTUEL=1, ACTUEL_MODIF=2, DELEVOYE=3, COMM_PM=4)
+  regime = regimes[pRegime]
+  if(is.na(regime)) {
+    print(paste(pRegime, "n'est pas une valeur valide. Utilisation du régime actuel.", sep=" "))
+    regime = 1 # ACTUEL
+  }
 
   data("test")
   simul=test
@@ -36,7 +41,7 @@ simulate <- function(source, provided_age_exo=-1) {
                     'conjoint'
               ))
   for (field in c('ech', 'emp', 'fam')){
-    simul[[field]] = openxlsx::read.xlsx(sourcepath, field)
+    simul[[field]] = openxlsx::read.xlsx(source, field)
     for (d in conv[[field]]) {
       simul[[field]][[d]] = as.integer(simul[[field]][[d]])
     }
@@ -162,7 +167,7 @@ simulate <- function(source, provided_age_exo=-1) {
       openxlsx::writeData(wb, field, demoSimulation[[field]])
     }
     ## Save workbook
-    outputfile = str_c(str_sub(sourcepath,end=-6), 'results.xlsx', sep=".")
+    outputfile = str_c(str_sub(source,end=-6), 'results.xlsx', sep=".")
     openxlsx::saveWorkbook(wb, outputfile, overwrite = TRUE)
   }
 
