@@ -1475,6 +1475,9 @@ void DroitsRetr::LiqPrive(int AnneeRefAnticip) {
                     M->ValPtAGIRC_ARRCO[AnneeRefAnticip] *
                     (M->Prix[t] / M->Prix[AnneeRefAnticip]);
   }
+  pension_ar *= (1 + maj_rendement_univ);
+  pension_ag *= (1 + maj_rendement_univ);
+  pension_ag_ar *= (1 + maj_rendement_univ);
 
   // versement en VFU si le montant annuel de la pension est trop faible
   // (pas de série historique des seuils de VFU retrouvées => on conserve la
