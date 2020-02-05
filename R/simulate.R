@@ -1,6 +1,6 @@
 
 #' @description Calcule
-#' @export 
+#' @export
 simulate <- function(source, pRegime, provided_age_exo=-1) {
   # 0 = TauxPlein ; 3 = EXO
   comportement=0
@@ -105,20 +105,38 @@ simulate <- function(source, pRegime, provided_age_exo=-1) {
 
   demoSimulation = as.environment(simulation)
   destinieSim(demoSimulation)
+  postprocess(demoSimulation)
 
-  if (length(demoSimulation$retraites)) {
+  if(T) {
+    ## Create a new workbook
+    wb <- openxlsx::createWorkbook("fullhouse")
+    for (field in c("ech", "emp", "fam", "liquidations", "retraites", "salairenet", "taux_remplacement", "taux_remplacement_brut", "cotisations", "macro")){
+      openxlsx::addWorksheet(wb, field)
+      openxlsx::writeData(wb, field, demoSimulation[[field]])
+    }
+    ## Save workbook
+    outputfile = str_c(str_sub(source,end=-6), 'results.xlsx', sep=".")
+    openxlsx::saveWorkbook(wb, outputfile, overwrite = TRUE)
+  }
+
+  return(outputfile)
+}
+
+#' @export
+postprocess <- function(data) {
+  if (length(data$retraites)) {
     # détermination des derniers salaires
-    age_depart = demoSimulation$retraites %>% group_by(Id) %>% filter(pension != 0) %>%
+    age_depart = data$retraites %>% group_by(Id) %>% filter(pension != 0) %>%
       summarise(age=min(age)) %>% select(Id,age)
-    dernier_salaire_net_b = demoSimulation$salairenet %>% inner_join(age_depart, by=c('Id', 'age')) %>%
+    dernier_salaire_net_b = data$salairenet %>% inner_join(age_depart, by=c('Id', 'age')) %>%
       select(Id, age, dernier_salaire_net=salaires_net)
-    naiss = demoSimulation$ech %>% select(Id, anaiss)
+    naiss = data$ech %>% select(Id, anaiss)
     derniers_salaires_nets = dernier_salaire_net_b %>% left_join(by='Id', naiss) %>%
       mutate(annee=age+anaiss) %>% select(Id, annee, dernier_salaire_net)
 
     # desindexation infla
     base=2019
-    adjust_infla = demoSimulation$macro %>% select(annee, Prix)
+    adjust_infla = data$macro %>% select(annee, Prix)
     adjust_infla$ref = adjust_infla$Prix / adjust_infla$Prix[which(adjust_infla$annee == base)]
 
     deflate <- function(df, ...) {
@@ -138,7 +156,7 @@ simulate <- function(source, pRegime, provided_age_exo=-1) {
     }
     dernier_salaire_net_n = derniers_salaires_nets %>% deflate(dernier_salaire_net) %>%
       select(Id, dernier_salaire_net_neut)
-    demoSimulation$retraites <- demoSimulation$retraites %>%
+    data$retraites <- data$retraites %>%
       deflate(pension, retraite_nette) %>%
       left_join(by='Id', dernier_salaire_net_n) %>%
       mutate(
@@ -148,28 +166,16 @@ simulate <- function(source, pRegime, provided_age_exo=-1) {
         retraite_nette_neut_m = retraite_nette_neut / 12,
         TR_net_neut = retraite_nette_neut / dernier_salaire_net_neut
       )
-    #print(demoSimulation$retraites %>% select(annee, pension_neut_m))
+    #print(data$retraites %>% select(annee, pension_neut_m))
 
-    demoSimulation$taux_remplacement = demoSimulation$retraites %>% group_by(Id) %>% mutate(debut=min(annee)) %>% filter(annee == debut) %>% select(Id, TR_net_neut)
+    data$taux_remplacement = data$retraites %>% group_by(Id) %>% mutate(debut=min(annee)) %>% filter(annee == debut) %>% select(Id, TR_net_neut)
 
-    demoSimulation$taux_remplacement_brut <- inner_join(
-      demoSimulation$retraites %>% group_by(Id) %>% mutate(debut=min(annee)) %>% filter(annee == debut) %>% select(Id, age, pension),
-      demoSimulation$emp %>% group_by(Id) %>% mutate(age = age+1),
+    data$taux_remplacement_brut <- inner_join(
+      data$retraites %>% group_by(Id) %>% mutate(debut=min(annee)) %>% filter(annee == debut) %>% select(Id, age, pension),
+      data$emp %>% group_by(Id) %>% mutate(age = age+1),
       by = c("Id", "age")
     ) %>% select(Id, age, pension, salaire) %>% mutate(TR_brut = pension/salaire)
   }
 
-  if(T) {
-    ## Create a new workbook
-    wb <- openxlsx::createWorkbook("fullhouse")
-    for (field in c("ech", "emp", "fam", "liquidations", "retraites", "salairenet", "taux_remplacement", "taux_remplacement_brut", "cotisations", "macro")){
-      openxlsx::addWorksheet(wb, field)
-      openxlsx::writeData(wb, field, demoSimulation[[field]])
-    }
-    ## Save workbook
-    outputfile = str_c(str_sub(source,end=-6), 'results.xlsx', sep=".")
-    openxlsx::saveWorkbook(wb, outputfile, overwrite = TRUE)
-  }
-
-  return(outputfile)
+  return(data)
 }
