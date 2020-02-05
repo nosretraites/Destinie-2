@@ -1400,13 +1400,14 @@ void DroitsRetr::LiqPrive(int AnneeRefAnticip) {
 
   double taux = (agetest >= l.AgeMinRG) ? tauxliq_rg * l.TauxPleinRG : 0;
 
-
+  taux_prorat_univ = 1;
+  maj_rendement_univ = 0;
   if (options->codeRegime == COMM_PM && t >= t_transition) {
     // Corrige le taux de proratisation
-    double duree_avant_transition = duree_trim(Statuts_occ, t_transition);
+    duree_avant_transition = duree_trim(Statuts_occ, t_transition);
     taux_prorat_univ = min(1.0, max(0.0, duree_avant_transition / l.DureeProratRG));
-    taux *= taux_prorat_univ * (1 + maj_rendement_univ);
   }
+  taux *= taux_prorat_univ * (1 + maj_rendement_univ);
 
   // if  {taux=0;}
   // else
