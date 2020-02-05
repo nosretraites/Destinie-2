@@ -1462,6 +1462,11 @@ void DroitsRetr::LiqPrive(int AnneeRefAnticip) {
     pension_rg = 0;
   }
 
+  if (options->codeRegime == COMM_PM && t >= t_transition) {
+    // Force à 1 même avant l'âge du taux plein
+    prorat = 1;
+  }
+
   taux_prorat_rg = prorat;
 
   //######## Sous module ARRCO/AGIRC ###########################################
