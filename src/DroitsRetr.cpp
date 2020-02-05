@@ -416,6 +416,11 @@ void DroitsRetr::DecoteSurcote() {
     // l.SurcoteFP " << l.SurcoteFP <<endl;}
   }
 
+  if (options->codeRegime == COMM_PM && t >= t_transition) {
+    durdecote_rg = 0;
+    dursurcote_rg = 0;
+  }
+
   // Taux de liquidation au RG
   tauxliq_rg = (l.TauxPleinRG - l.DecoteRG * durdecote_rg +
                 l.SurcoteRG1 * max(dursurcote_rg, 0.0) +
