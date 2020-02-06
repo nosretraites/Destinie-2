@@ -48,18 +48,20 @@ get_macro <- function() {
   total = length(eco$macro$annee)
   duree = 17 # année
   debut = 2025 # croissance de 2025 appliquée en 2026 cf lag dans seriep
-  base = 'Prixp'
-  dest = 'SMPTp'
 
-  idebut = debut - 1900 +1
+  idebut = debut - 1900 + 1
   transition = 0:duree/duree
-  propBase = c(rep(0, idebut -1),1-transition,rep(0,total-duree-idebut))
-  propDest = c(rep(0, idebut -1),transition,rep(1,total-duree-idebut))
-  seriep = cumprod(1 + lag(eco$macro[[base]] * propBase + eco$macro[[dest]] * propDest, default=0))
+  propInfla = c(rep(0, idebut - 1), 1 - transition, rep(0, total - duree - idebut))
+  propCroissance = c(rep(0, idebut - 1), transition, rep(1, total - duree - idebut))
+
+  serieInfla = eco$macro$Prixp
+  serieCroissanceFlat = eco$macro$SMPTp
+  serieCroissance = (1 + serieCroissanceFlat) * (1 + serieInfla) - 1
+  seriep = cumprod(1 + lag(serieInfla * propInfla + serieCroissance * propCroissance, default=0))
 
   eco$macro <-eco$macro%>% mutate(
-    IndexationBaseReforme = propBase,
-    IndexationDestReforme = propDest,
+    IndexationInflaReforme = propInfla,
+    IndexationCroissanceReforme = propCroissance,
     CotisationReforme = 0.2531,
     ValeurAchatReforme = 10 * seriep,
     ValeurVenteReforme = 0.55 * seriep,
