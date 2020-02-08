@@ -1403,6 +1403,11 @@ void DroitsRetr::LiqPrive(int AnneeRefAnticip) {
       prorat = 0;
   }
 
+  if (options->codeRegime == COMM_PM && t >= t_transition) {
+    // Force à 1 même avant l'âge du taux plein
+    prorat = 1;
+  }
+
   double taux = (agetest >= l.AgeMinRG) ? tauxliq_rg * l.TauxPleinRG : 0;
 
   taux_prorat_univ = 1;
@@ -1442,11 +1447,6 @@ void DroitsRetr::LiqPrive(int AnneeRefAnticip) {
   if (sam_rg == UNDEF || sam_rg == 0)
     sam_rg = 2 * M->Mincont1[t];
   // A REVOIR !!!
-
-  if (options->codeRegime == COMM_PM && t >= t_transition) {
-    // Force à 1 même avant l'âge du taux plein
-    prorat = 1;
-  }
 
   // Calcul de la pension avec condition de plafonnement
   if (datetest < 1983.25) {
