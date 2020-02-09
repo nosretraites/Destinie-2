@@ -51,7 +51,7 @@ get_macro <- function() {
 
   idebut = debut - 1900 + 1
   transition = 0:duree/duree
-  propInfla = c(rep(0, idebut - 1), 1 - transition, rep(0, total - duree - idebut))
+  propInfla = c(rep(0, idebut - 1 - 3), rep(1, 3), 1 - transition, rep(0, total - duree - idebut))
   propCroissance = c(rep(0, idebut - 1), transition, rep(1, total - duree - idebut))
 
   serieInfla = eco$macro$Prixp
