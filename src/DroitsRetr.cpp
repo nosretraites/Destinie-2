@@ -981,7 +981,7 @@ void DroitsRetr::Points(
     }
 
     if (u>=t_transition) {
-      rcp.points_univ_post += X.salaires[a] * M->CotisationReforme[u] / M->ValeurAchatReforme[u];
+      rcp.points_univ_post += trunc * X.salaires[a] * M->CotisationReforme[u] / M->ValeurAchatReforme[u];
     }
 
     /*else if(rc.durpergratuit){
