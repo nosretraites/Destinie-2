@@ -57,7 +57,7 @@ get_macro <- function() {
   serieInfla = eco$macro$Prixp
   serieCroissanceFlat = eco$macro$SMPTp
   serieCroissance = (1 + serieCroissanceFlat) * (1 + serieInfla) - 1
-  seriep = cumprod(1 + lag(serieInfla * propInfla + serieCroissance * propCroissance, default=0))
+  seriep = cumprod(1 + lag(serieInfla, default=0) * propInfla + lag(serieCroissance, default=0) * propCroissance)
 
   eco$macro <-eco$macro%>% mutate(
     IndexationInflaReforme = propInfla,
