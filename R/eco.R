@@ -59,9 +59,12 @@ get_macro <- function() {
   serieCroissance = (1 + serieCroissanceFlat) * (1 + serieInfla) - 1
   seriep = cumprod(1 + lag(serieInfla, default=0) * propInfla + lag(serieCroissance, default=0) * propCroissance)
 
+  seriep = seriep / seriep[eco$macro$annee == 2025]
+
   eco$macro <-eco$macro%>% mutate(
     IndexationInflaReforme = propInfla,
     IndexationCroissanceReforme = propCroissance,
+    IndexationSUR = seriep,
     CotisationReforme = 0.2531,
     ValeurAchatReforme = 10 * seriep,
     ValeurVenteReforme = 0.55 * seriep,
