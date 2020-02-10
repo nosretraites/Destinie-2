@@ -110,7 +110,7 @@ simulate <- function(source, pRegime, provided_age_exo=-1) {
   if(T) {
     ## Create a new workbook
     wb <- openxlsx::createWorkbook("fullhouse")
-    for (field in c("ech", "emp", "fam", "liquidations", "retraites", "salairenet", "taux_remplacement", "taux_remplacement_brut", "cotisations", "macro")){
+    for (field in c("ech", "emp", "fam", "liquidations", "retraites", "salairenet", "taux_remplacement", "cotisations", "macro")){
       openxlsx::addWorksheet(wb, field)
       openxlsx::writeData(wb, field, demoSimulation[[field]])
     }

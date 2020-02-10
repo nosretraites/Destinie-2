@@ -340,7 +340,7 @@ postprocess(demoSimulation)
 if(T) {
   ## Create a new workbook
   wb <- createWorkbook("fullhouse")
-  for (field in c("ech", "emp", "fam", "liquidations", "retraites", "salairenet", "taux_remplacement", "taux_remplacement_brut", "cotisations", "macro")){
+  for (field in c("ech", "emp", "fam", "liquidations", "retraites", "salairenet", "taux_remplacement", "cotisations", "macro")){
     addWorksheet(wb, field)
     writeData(wb, field, demoSimulation[[field]])
   }
