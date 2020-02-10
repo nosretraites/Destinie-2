@@ -8,4 +8,4 @@ library(destinie)
 args = commandArgs(trailingOnly = TRUE)
 source = args[[1]]
 
-duplicate_ages(source, seq(55, 68))
+duplicate_ages(source, seq(62, 68))
