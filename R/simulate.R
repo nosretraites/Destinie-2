@@ -134,6 +134,11 @@ postprocess <- function(data) {
     derniers_salaires_nets = dernier_salaire_net_b %>% left_join(by='Id', naiss) %>%
       mutate(annee=age+anaiss) %>% select(Id, annee, dernier_salaire_net)
 
+    dernier_salaire_brut_b = data$emp %>% inner_join(age_depart, by=c('Id', 'age')) %>%
+      select(Id, age, dernier_salaire_brut=salaire)
+    dernier_salaire_bruts = dernier_salaire_brut_b %>% left_join(by='Id', naiss) %>%
+      mutate(annee=age+anaiss) %>% select(Id, annee, dernier_salaire_brut)
+
     # desindexation infla
     base=2019
     adjust_infla = data$macro %>% select(annee, Prix)
@@ -155,26 +160,33 @@ postprocess <- function(data) {
       )
     }
     dernier_salaire_net_n = derniers_salaires_nets %>% deflate(dernier_salaire_net) %>%
-      select(Id, dernier_salaire_net_neut)
+      select(Id, dernier_salaire_net, dernier_salaire_net_neut)
+
+    dernier_salaire_brut_n = dernier_salaire_bruts  %>% deflate(dernier_salaire_brut) %>%
+      select(Id, dernier_salaire_brut, dernier_salaire_brut_neut)
+
     data$retraites <- data$retraites %>%
       deflate(pension, retraite_nette) %>%
       left_join(by='Id', dernier_salaire_net_n) %>%
+      left_join(by='Id', dernier_salaire_brut_n) %>%
       mutate(
         pension_m = pension / 12,
         pension_neut_m = pension_neut / 12,
         retraite_nette_m = retraite_nette / 12,
         retraite_nette_neut_m = retraite_nette_neut / 12,
-        TR_net_neut = retraite_nette_neut / dernier_salaire_net_neut
+        TR_net_neut = retraite_nette_neut / dernier_salaire_net_neut,
+        TR_brut_neut = pension_neut / dernier_salaire_brut_neut,
       )
-    #print(data$retraites %>% select(annee, pension_neut_m))
 
-    data$taux_remplacement = data$retraites %>% group_by(Id) %>% mutate(debut=min(annee)) %>% filter(annee == debut) %>% select(Id, TR_net_neut)
-
-    data$taux_remplacement_brut <- inner_join(
-      data$retraites %>% group_by(Id) %>% mutate(debut=min(annee)) %>% filter(annee == debut) %>% select(Id, age, pension),
-      data$emp %>% group_by(Id) %>% mutate(age = age+1),
-      by = c("Id", "age")
-    ) %>% select(Id, age, pension, salaire) %>% mutate(TR_brut = pension/salaire)
+    data$taux_remplacement = data$retraites %>% group_by(Id) %>%
+      mutate(debut=min(annee)) %>%
+      filter(annee == debut) %>%
+      select(Id, age,
+        TR_brut_neut, TR_net_neut,
+        pension, pension_neut,
+        dernier_salaire_brut, dernier_salaire_brut_neut,
+        retraite_nette, retraite_nette_neut,
+        dernier_salaire_net, dernier_salaire_net_neut)
   }
 
   return(data)

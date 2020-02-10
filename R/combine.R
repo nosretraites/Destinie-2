@@ -72,7 +72,7 @@ duplicate_ages <- function(source, age_exo) {
 #' @description Importe les paramètres stockés dans les fichiers excel avec les options 
 #' @export 
 aggregate_results <- function(shifted, reforme, result_path) {
-  field='taux_remplacement_brut'
+  field='taux_remplacement'
 
   shifted_ech = openxlsx::read.xlsx(shifted, 'ech')
   shifted_tr = openxlsx::read.xlsx(shifted, field) %>% mutate(scenario='actuel') %>% left_join(shifted_ech %>% select(Id, anaiss), by="Id")
