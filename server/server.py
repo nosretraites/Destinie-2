@@ -24,6 +24,11 @@ def example():
     return send_file('example.xlsx', as_attachment=True)
 
 
+@app.route('/carrieres.xlsx', methods=['GET'])
+def carrieres():
+    return send_file('../demo/carrieres.xlsx')
+
+
 SANE_MODELS = ['ACTUEL', 'ACTUEL_MODIF', 'DELEVOYE', 'COMM_PM']
 def common_parameters(form, sep=' '):
     params = []
