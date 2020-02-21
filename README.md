@@ -5,73 +5,74 @@ Le modèle Destinie 2 (modèle Démographique Économique et Social de Trajectoi
 
 ## Prise en main
 
-
 Dans RStudio, ouvrir le projet Destinie-2 puis « Install and Restart ».
-
 
 Voir page 106 de la documentation.
 
+
 ### Depuis un shell
 
-Depuis le dossier Destinie-2 (root du dépôt)
+
+#### Installer les libraries nécessaires
+
+Ubuntu:
 
 ```
-R CMD INSTALL . --preclean --debug
-Rscript demo/simulation.R --file server/example.xlsx
-test -f server/example.results.xlsx
+apt-get install build-essential libssl-dev libcurl4-openssl-dev libxml2-dev
 ```
 
-
-Il sera très vraisemblablement nécessaire de lancer plusieurs fois la commande suivante avec divers noms de libraries.
-
-```
-Rscript -e ".libPaths('~/R-tests');install.packages(c('xlsx'))"
-```
-
-### Notes de debug 😅
-
+macOS :
 
 ```
-# 3. Installer les packages nécessaires à Destinie :
-install.packages(c("devtools","pkgbuild"))
+brew install r openssl@1.1 libxml2
 ```
 
-ERROR: dependencies 'usethis', 'covr', 'httr', 'roxygen2', 'rversions' are not available for package 'devtools'
-
-
-```
-export LC_ALL=C
-apt-get install libssl-dev libcurl4-openssl-dev libxml2-dev
-```
+Puis modifier le fichier ~/.R/Makevars, par exemple :
 
 ```
-# 4. Installation du package Destinie :
-# pour obtenir un "TRUE".
-library(devtools)
-devtools::find_rtools()
-# ou pkgbuild::find_rtools()
-
-
-install.packages(c("zip", "openxlsx", "plogr", "rJava", "tidyselect", "xlsxjars", "xlsx"))
-
-
-devtools::install()
+CC=clang
+CXX=clang++
 ```
 
-```
-Rscript -e ".libPaths('~/R-tests');install.packages(c('ggplot2', 'tidyr', 'dplyr', 'openxlsx', 'xlsx'))"
-Rscript -e ".libPaths('~/R-tests');install.packages(c('xlsx'))"
-```
+#### Re/installer et configurer Java
 
+Linux :
+
+```
+apt-get install default-jre
+apt-get install default-jdk
+R CMD javareconf
+apt-get install r-cran-rjava
+```
 
 https://github.com/hannarud/r-best-practices/wiki/Installing-RJava-(Ubuntu)
 
-apt-get install default-jre
-apt-get install default-jdk
+macOS :
 
+```
+brew cask install java
 R CMD javareconf
+```
 
-apt-get install r-cran-rjava
+#### Installer les paquets
+
+Depuis le dossier Destinie-2 (root du dépôt) :
+
+```
+R -e "install.packages('renv', repos = 'https://cloud.r-project.org')"
+R -e "renv::restore()"
+R CMD INSTALL . --preclean --debug
+```
+
+
+#### Tester l'installation
+
+Depuis le dossier Destinie-2 (root du dépôt) :
+
+```
+Rscript demo/simulation.R --file server/example.xlsx
+test -f server/example.results.xlsx
+```
 
 ### Avec Docker
 
