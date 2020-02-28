@@ -3,3 +3,4 @@ flask-cors==3.0.8
 gunicorn==19.9.0
 pandas==0.25.3
 xlrd==1.2.0
+xlsxwriter==1.2.7
